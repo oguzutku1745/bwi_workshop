@@ -1,0 +1,196 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Coffee Workshop UI */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-emoji {
+  font-size: 1.75rem;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.intro {
+  margin-top: 0.25rem;
+}
+
+.muted {
+  color: #888;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 800px) {
+  .actions-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .full-row {
+    grid-column: 1 / -1;
+  }
+}
+
+.action-card {
+  text-align: left;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .action-card {
+    background: #ffffff;
+    border-color: rgba(0,0,0,0.08);
+  }
+}
+
+.action-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.125rem;
+}
+
+.action-subtitle {
+  margin: 0 0 0.75rem 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form.row {
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field.grow {
+  flex: 1 1 auto;
+}
+
+.align-end {
+  align-self: flex-end;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.label.hidden {
+  visibility: hidden;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.04);
+  color: inherit;
+  padding: 0.6rem 0.8rem;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+@media (prefers-color-scheme: dark) {
+  .input,
+  .textarea {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+  }
+}
+
+.primary-btn {
+  border-radius: 10px;
+  border: 1px solid transparent;
+  padding: 0.7rem 1rem;
+  font-weight: 600;
+  background-color: #8B5CF6; /* violet */
+  color: white;
+  transition: transform 120ms ease, opacity 120ms ease, background 200ms ease;
+}
+
+.primary-btn:hover {
+  background-color: #7C3AED;
+}
+
+.primary-btn:active {
+  transform: translateY(1px);
+}
+
+.footer {
+  margin-top: 0.5rem;
+}
