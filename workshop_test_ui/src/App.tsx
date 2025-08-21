@@ -29,7 +29,7 @@ function App() {
 
   const { wallet, publicKey, requestRecordPlaintexts, requestTransaction } = useWallet();
   // Chain must match WalletProvider network (src/main.tsx uses Testnet).
-  // Program workshop_test.aleo is deployed on Testnet (Provable explorer).
+  // Program workshop_coffee_shop is deployed on Testnet (Provable explorer).
   // Use "testnet" for all createTransaction calls.
 
 
@@ -59,7 +59,7 @@ function App() {
         chainId: "testnetbeta",
         transitions: [
           {
-            program: "workshop_test.aleo",
+            program: "workshop_coffee_shop.aleo",
             functionName: "buy_public",
             inputs: [`${parsed}u8`],
           },
@@ -94,7 +94,7 @@ function App() {
       const aleoTransaction = Transaction.createTransaction(
         publicKey,
         "testnetbeta",
-        "workshop_test.aleo",
+        "workshop_coffee_shop.aleo",
         "buy_private",
         [recordInput as any, `${amt}u8`],
         100000,
@@ -124,7 +124,7 @@ function App() {
       const aleoTransaction = Transaction.createTransaction(
         publicKey,
         "testnetbeta",
-        "workshop_test.aleo",
+        "workshop_coffee_shop.aleo",
         "combine_records",
         [a as any, b as any],
         100000,
@@ -158,7 +158,7 @@ function App() {
       const aleoTransaction = Transaction.createTransaction(
         publicKey,
         "testnetbeta",
-        "workshop_test.aleo",
+        "workshop_coffee_shop.aleo",
         "split_records",
         [rec as any, `${amount}u64`],
         100000,
@@ -346,7 +346,7 @@ function App() {
               setCheckedAmount(null);
               try {
                 const resp = await fetch(
-                  `https://api.aleoscan.io/v3/mapping/get_value/workshop_test.aleo/total_coffee/${addressToCheck}`
+                  `https://api.aleoscan.io/v3/mapping/get_value/workshop_coffee_shop/total_coffee/${addressToCheck}`
                 );
                 if (!resp.ok) throw new Error("Failed to query mapping");
                 const data = await resp.json();

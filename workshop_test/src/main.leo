@@ -1,24 +1,14 @@
 import credits.aleo;
 
 // The 'workshop_test' program.
-program workshop_test.aleo {
-    // This is the constructor for the program.
-    // The constructor allows you to manage program upgrades.
-    // It is called when the program is deployed or upgraded.
-    // It is currently configured to **prevent** upgrades.
-    // Other configurations include: 
-    //  - @admin(address="aleo1...")
-    //  - @checksum(mapping="credits.aleo/fixme", key="0field")
-    //  - @custom
-    // For more information, please refer to the documentation: `https://docs.leo-lang.org/guides/upgradability`
-    @noupgrade
-    async constructor() {}
+program workshop_coffee_shop.aleo {
 
     const shop_address: address = aleo1rhgdu77hgyqd3xjj8ucu3jj9r2krwz6mnzyd80gncr5fxcwlh5rsvzp9px;
-    const coffee_price: u64 = 1000000;
-
     // Define a coffee price in terms of Aleo
+    const coffee_price: u64 = 1000000u64;
 
+
+    // Define a mapping to store the total amount of coffee bought by each address
     mapping total_coffee:address => u8;
 
     // Buy it publicly (But keep the total amounts of coffee private)
@@ -72,6 +62,10 @@ program workshop_test.aleo {
 
         let (main, remainder): (credits.aleo/credits, credits.aleo/credits) = credits.aleo/split(bill, amount_to_be_splitted);
         return (main,remainder);
+    }
+
+    @noupgrade
+    async constructor() {
     }
 
 }
