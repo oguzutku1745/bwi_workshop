@@ -1,7 +1,7 @@
 import credits.aleo;
 
-// The 'workshop_test' program.
-program workshop_coffee_shop.aleo {
+// The 'workshop_buy_coffee' program.
+program workshop_buy_coffee.aleo {
 
     const shop_address: address = aleo1rhgdu77hgyqd3xjj8ucu3jj9r2krwz6mnzyd80gncr5fxcwlh5rsvzp9px;
     // Define a coffee price in terms of Aleo
@@ -33,7 +33,7 @@ program workshop_coffee_shop.aleo {
     async function finalize_buy_public(f0: Future, public buyer:address, public amount:u8) {
         f0.await();
 
-        let current_coffee:u8 = Mapping::get(total_coffee, buyer);
+        let current_coffee:u8 = Mapping::get_or_use(total_coffee, buyer, 0u8);
         Mapping::set(total_coffee, buyer, current_coffee + amount);
     }
 
@@ -48,7 +48,7 @@ program workshop_coffee_shop.aleo {
     }
 
     async function finalize_buy_private(buyer:address, amount:u8) {
-        let current_coffee:u8 = Mapping::get(total_coffee, buyer);
+        let current_coffee:u8 = Mapping::get_or_use(total_coffee, buyer, 0u8);
         Mapping::set(total_coffee, buyer, current_coffee + amount);
     }
 

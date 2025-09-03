@@ -22,7 +22,7 @@ const Root = () => {
       }),
       new PuzzleWalletAdapter({
         programIdPermissions: {
-          [WalletAdapterNetwork.TestnetBeta]: ['token_registry.aleo', 'workshop_coffee_shop.aleo']
+          [WalletAdapterNetwork.TestnetBeta]: ['token_registry.aleo', 'workshop_buy_coffee.aleo']
         },
         appName: 'Aleo app',
         appDescription: 'A privacy-focused DeFi app',
@@ -44,7 +44,7 @@ const Root = () => {
         wallets={wallets}
         network={WalletAdapterNetwork.TestnetBeta}
         decryptPermission={DecryptPermission.OnChainHistory}
-        programs={['credits.aleo', 'workshop_coffee_shop.aleo']}
+        programs={['credits.aleo', 'workshop_buy_coffee.aleo']}
         autoConnect
       >
         <WalletModalProvider>

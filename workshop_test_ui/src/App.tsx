@@ -20,17 +20,18 @@ function App() {
   const [checkedAmount, setCheckedAmount] = useState<string | null>(null);
   const [recordProgramId, setRecordProgramId] = useState("credits.aleo");
   const [recordsLoading, setRecordsLoading] = useState(false);
-  const [fetchedRecords, setFetchedRecords] = useState<Array<{ plaintext: string; spent?: boolean }>>([]);
+  const [onlyUnspent, setOnlyUnspent] = useState(true);
+  const [recordsPayload, setRecordsPayload] = useState<string>("");
   const [buyPrivateLoading, setBuyPrivateLoading] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
   const [splitLoading, setSplitLoading] = useState(false);
 
   // no-op removed; each form handles its own submit
 
-  const { wallet, publicKey, requestRecordPlaintexts, requestTransaction } = useWallet();
+  const { wallet, publicKey, requestRecords, requestTransaction } = useWallet();
   // Chain must match WalletProvider network (src/main.tsx uses Testnet).
-  // Program workshop_coffee_shop is deployed on Testnet (Provable explorer).
-  // Use "testnet" for all createTransaction calls.
+  // Program workshop_buy_coffee is deployed on Testnet (Provable explorer).
+  // Use relative network for all createTransaction calls.
 
 
   function tryParseJSON<T = unknown>(input: string): T | string {
@@ -40,6 +41,8 @@ function App() {
       return input;
     }
   }
+
+  // Keep inputs exactly as the user pasted (Aleo plaintext strings)
 
   async function handleBuyPublic(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -59,12 +62,12 @@ function App() {
         chainId: "testnetbeta",
         transitions: [
           {
-            program: "workshop_coffee_shop.aleo",
+            program: "workshop_buy_coffee.aleo",
             functionName: "buy_public",
             inputs: [`${parsed}u8`],
           },
         ],
-        fee: 100000,
+        fee: 500000,
         feePrivate: false,
       });
       setLastTxId(String(result));
@@ -88,16 +91,17 @@ function App() {
       alert("Paste a credits.aleo/credits record JSON");
       return;
     }
+    // Treat the entire textarea as ONE input (Aleo plaintext string or JSON)
     const recordInput = tryParseJSON(privateRecordJson);
     setBuyPrivateLoading(true);
     try {
       const aleoTransaction = Transaction.createTransaction(
         publicKey,
         "testnetbeta",
-        "workshop_coffee_shop.aleo",
+        "workshop_buy_coffee.aleo",
         "buy_private",
         [recordInput as any, `${amt}u8`],
-        100000,
+        500000,
         false
       );
       const txId = await (wallet.adapter as any).requestTransaction(aleoTransaction);
@@ -117,6 +121,7 @@ function App() {
       alert("Paste two credits.aleo/credits records (JSON)");
       return;
     }
+    // Treat each textarea as ONE input (Aleo plaintext string or JSON)
     const a = tryParseJSON(joinRecordA);
     const b = tryParseJSON(joinRecordB);
     setJoinLoading(true);
@@ -124,10 +129,10 @@ function App() {
       const aleoTransaction = Transaction.createTransaction(
         publicKey,
         "testnetbeta",
-        "workshop_coffee_shop.aleo",
+        "workshop_buy_coffee.aleo",
         "combine_records",
         [a as any, b as any],
-        100000,
+        500000,
         false
       );
       const txId = await (wallet.adapter as any).requestTransaction(aleoTransaction);
@@ -152,16 +157,17 @@ function App() {
       alert("Enter a valid split amount (u64)");
       return;
     }
+    // Treat the entire textarea as ONE input (Aleo plaintext string or JSON)
     const rec = tryParseJSON(splitRecord);
     setSplitLoading(true);
     try {
       const aleoTransaction = Transaction.createTransaction(
         publicKey,
         "testnetbeta",
-        "workshop_coffee_shop.aleo",
+        "workshop_buy_coffee.aleo",
         "split_records",
         [rec as any, `${amount}u64`],
-        100000,
+        500000,
         false
       );
       const txId = await (wallet.adapter as any).requestTransaction(aleoTransaction);
@@ -345,13 +351,13 @@ function App() {
               setCheckLoading(true);
               setCheckedAmount(null);
               try {
+                const to_check = `https://api.explorer.provable.com/v1/testnet/program/workshop_buy_coffee.aleo/mapping/total_coffee/${addressToCheck}`
                 const resp = await fetch(
-                  `https://api.aleoscan.io/v3/mapping/get_value/workshop_coffee_shop/total_coffee/${addressToCheck}`
+                  to_check
                 );
                 if (!resp.ok) throw new Error("Failed to query mapping");
                 const data = await resp.json();
-                const value: string | undefined = data?.value;
-                setCheckedAmount(value ?? "0u8");
+                setCheckedAmount(data);
               } catch (err) {
                 console.error(err);
                 alert("Unable to read mapping value right now.");
@@ -398,21 +404,20 @@ function App() {
           <form
             onSubmit={async (e) => {
               e.preventDefault();
-              if (!requestRecordPlaintexts) {
+              if (!requestRecords) {
                 alert("No wallet connected");
                 return;
               }
               setRecordsLoading(true);
-              setFetchedRecords([]);
+              setRecordsPayload("");
               try {
-                const recs = await requestRecordPlaintexts(recordProgramId);
-                // Prefer unspent
-                const unspent = Array.isArray(recs) ? recs.filter((r: any) => !r?.spent) : [];
-                const normalized = (unspent.length > 0 ? unspent : recs || []).map((r: any) => ({
-                  plaintext: r?.plaintext ?? String(r ?? ""),
-                  spent: Boolean(r?.spent),
-                }));
-                setFetchedRecords(normalized);
+                const recs = await requestRecords(recordProgramId);
+                console.log(recs);
+                const filtered = Array.isArray(recs)
+                  ? recs.filter((r: any) => (onlyUnspent ? r && r.spent === false : true))
+                  : [];
+                const recordsFormatted = filtered.map((rec: any) => JSON.stringify(rec, null, 2));
+                setRecordsPayload(recordsFormatted.join('\n'));
               } catch (err) {
                 console.error(err);
                 alert("Could not fetch records.");
@@ -422,6 +427,15 @@ function App() {
             }}
             className="form"
           >
+            <div className="field">
+              <label htmlFor="only-unspent" className="label">Only include Unspent Records</label>
+              <input
+                id="only-unspent"
+                type="checkbox"
+                checked={onlyUnspent}
+                onChange={(e) => setOnlyUnspent(e.target.checked)}
+              />
+            </div>
             <div className="field">
               <label htmlFor="record-program" className="label">Program ID</label>
               <input
@@ -437,32 +451,31 @@ function App() {
               {recordsLoading ? "Fetching..." : "Fetch Records"}
             </button>
           </form>
-
-          {fetchedRecords.length > 0 ? (
+          {recordsPayload ? (
             <div className="form" style={{ marginTop: "0.75rem" }}>
-              {fetchedRecords.map((r, idx) => (
-                <div className="field" key={idx}>
-                  <label className="label">Record #{idx + 1}{r.spent ? " (spent)" : ""}</label>
-                  <textarea className="textarea" rows={4} readOnly value={r.plaintext} />
-                  <div>
-                    <button
-                      className="primary-btn"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(r.plaintext);
-                        } catch {
-                          /* ignore */
-                        }
-                      }}
-                    >
-                      Copy
-                    </button>
-                  </div>
+              <div className="field">
+                <label className="label">Records</label>
+                <textarea className="textarea" rows={10} readOnly value={recordsPayload} />
+                <div>
+                  <button
+                    className="primary-btn"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(recordsPayload);
+                      } catch {
+                        /* ignore */
+                      }
+                    }}
+                  >
+                    Copy
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
           ) : null}
         </div>
+
+        
       </section>
 
       <footer className="footer muted">

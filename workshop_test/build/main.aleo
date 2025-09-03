@@ -1,5 +1,5 @@
 import credits.aleo;
-program workshop_coffee_shop.aleo;
+program workshop_buy_coffee.aleo;
 
 mapping total_coffee:
     key as address.public;
@@ -13,14 +13,14 @@ function buy_public:
     mul 1000000u64 r1 into r2;
     call credits.aleo/transfer_public_as_signer aleo1rhgdu77hgyqd3xjj8ucu3jj9r2krwz6mnzyd80gncr5fxcwlh5rsvzp9px r2 into r3;
     async buy_public r3 self.signer r0 into r4;
-    output r4 as workshop_coffee_shop.aleo/buy_public.future;
+    output r4 as workshop_buy_coffee.aleo/buy_public.future;
 
 finalize buy_public:
     input r0 as credits.aleo/transfer_public_as_signer.future;
     input r1 as address.public;
     input r2 as u8.public;
     await r0;
-    get total_coffee[r1] into r3;
+    get.or_use total_coffee[r1] 0u8 into r3;
     add r3 r2 into r4;
     set r4 into total_coffee[r1];
 
@@ -33,12 +33,12 @@ function buy_private:
     async buy_private self.signer r1 into r6;
     output r4 as credits.aleo/credits.record;
     output r5 as credits.aleo/credits.record;
-    output r6 as workshop_coffee_shop.aleo/buy_private.future;
+    output r6 as workshop_buy_coffee.aleo/buy_private.future;
 
 finalize buy_private:
     input r0 as address.public;
     input r1 as u8.public;
-    get total_coffee[r0] into r2;
+    get.or_use total_coffee[r0] 0u8 into r2;
     add r2 r1 into r3;
     set r3 into total_coffee[r0];
 
